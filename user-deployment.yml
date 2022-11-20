@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-user
+  labels:
+    service: backend-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      service: backend-user
+  template:
+    metadata:
+      labels:
+        service: backend-user
+    spec:
+      containers:
+      - name: backend-user
+        image: pamsy/udagram-api-user:v1
+        ports:
+          - containerPort: 8080
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+          - secretRef: 
+              name: env-pamsy-secrets
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "75m"
+        volumeMounts:
+          - mountPath: "/root/.aws/"
+            name: aws-creds
+      volumes: 
+        - name: aws-creds
+          configMap:
+            name: aws-creds
